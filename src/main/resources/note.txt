@@ -1,0 +1,8 @@
+sql:load 文件到数据库
+sql语句：
+Load Data INfile 'C:\\Users\\pain\\Desktop\\Recv-172.20.254.29-1497958569511-Audit-PCAU.txt' into table test
+CHARACTER set utf8 fields terminated by ',' ENCLOSED by '\"' lines terminated by '\r\n' (platMac,str,timestap,`user`,`name`,path,type,typeId)
+
+fields terminated by：文件中字段值以【，】号分割
+lines terminated by '\r\n'  ：每行记录以回车换行符结尾
+ENCLOSED by '\"' ：字段值中出现【"】以【\】进行转移
