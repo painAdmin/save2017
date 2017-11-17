@@ -36,6 +36,7 @@ import sun.security.x509.X509CertInfo;
  * @author pain
  * !! keyStore.store(io,passWord)  每次存储都会更新keystore 秘钥库的密码
  * !! keyStore.setKeyEntry(..,..,password,..) 密码是用来保护私钥的
+ *       cert.getSerialNumber().toString(16).toLowerCase()  以16进制返回序列号字符串，与双击查看的字符串一致，如默认则是以10进制显示
  */
 public class CertUtils {
     private static final String keyStorePath="C:\\Users\\pain\\Desktop\\cert\\huatech.keystore";
