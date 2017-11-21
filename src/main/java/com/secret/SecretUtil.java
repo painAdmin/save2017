@@ -2,6 +2,8 @@ package com.secret;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -86,10 +88,13 @@ public class SecretUtil {
 	     } 
 	public static void main(String[] args) throws Exception{
 		String data="test123.com";
-		String encoderStr=encryptBASE64(encrypt(data.getBytes("UTF-8"),privatekey));
-		String decdoerStr=new String(decrypt(decryptBASE64(encoderStr),privatekey),"UTF-8");
-		System.out.println("加密前:"+data);
-		System.out.println("base64加密后:"+encoderStr);
-		System.out.println("解密后:"+decdoerStr);
+//		String encoderStr=encryptBASE64(encrypt(data.getBytes("UTF-8"),privatekey));
+//		String decdoerStr=new String(decrypt(decryptBASE64(encoderStr),privatekey),"UTF-8");
+//		System.out.println("加密前:"+data);
+//		System.out.println("base64加密后:"+encoderStr);
+//		System.out.println("解密后:"+decdoerStr);
+		String sec=encryptBASE64("huatestTest123123.com".getBytes("UTF-8"));
+		String str=new String(decryptBASE64("NzM2Njk0NTIwQ0YxODFBNg=="),"UTF-8");
+	   System.out.println(str);
 	}
 }

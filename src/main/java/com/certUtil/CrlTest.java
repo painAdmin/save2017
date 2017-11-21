@@ -34,7 +34,7 @@ public class CrlTest {
 		String certFile="C:\\Users\\pain\\Desktop\\cert\\user.cer";
 		readcerCert(certFile);
 		//downloadFile(remoteFile,localFile);
-		//parseCrl(path);
+		parseCrl(path);
 
 	}
 	/**
@@ -80,7 +80,7 @@ public class CrlTest {
 			System.out.println("序列号:"+cert.getSerialNumber().toString().toLowerCase());
 			System.out.println("issueDN:"+cert.getIssuerDN());
 			System.out.println("subjectDN"+cert.getSubjectDN());
-			System.out.println("证书算法OIDsignAllgoID"+cert.getSigAlgOID());
+			System.out.println("证书算法OIDsignAllgoID:"+cert.getSigAlgOID());
 			System.out.println("有效期："+cert.getNotAfter());
 			System.out.println("签名算法"+cert.getSigAlgName());
 			System.out.println("版本号："+cert.getVersion());
