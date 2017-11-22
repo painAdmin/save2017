@@ -1,12 +1,19 @@
 package com.certUtil;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.CRL;
@@ -22,19 +29,42 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.secret.SecretUtil;
+
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileInputStream;
+import jcifs.smb.SmbFileOutputStream;
+
 
 
 public class CrlTest {
 
 	
 	public static void main(String[] args) throws Exception {
-		String path="C:\\Users\\pain\\Desktop\\certDis.crl";
+		
+	
+		String certFile="C:\\Users\\pain\\Desktop\\cert\\user.cer";
+		// 解析cer证书信息
+		//readcerCert(certFile);
+		
 		String remoteFile="http://down.qingkan9.com/1/1070.txt";
 		String localFile="C:\\Users\\pain\\Desktop\\舞动乾坤.txt";
-		String certFile="C:\\Users\\pain\\Desktop\\cert\\user.cer";
-		readcerCert(certFile);
+		//下载url远程文件
 		//downloadFile(remoteFile,localFile);
-		parseCrl(path);
+		String path="C:\\Users\\pain\\Desktop\\certDis.crl";
+		//解析crl文件
+		//parseCrl(path);
+		
+		//如果有密码 Smb://username:password@ip/sharefolder  || smb://chb:123456@192.168.0.1/test
+		String smbRemote="smb://pain:123.com@192.168.128.130/file://WIN-3LBGO979C1F/CertEnroll/WIN-3LBGO979C1F-CA.crl";
+		String localSmb="C:\\Users\\pain\\Desktop\\WIN-3LBGO979C1F-CA.crl";
+		//下载共享文件 测试失败
+		//getSMBFile(smbRemote,localSmb);
+		String remotePath="\\\\WIN-3LBGO979C1F\\CertEnroll\\WIN-3LBGO979C1F-CA.crl";
+		String localPath="C:\\Users\\pain\\Desktop\\WIN-3LBGO979C1F-CA.crl";
+		// 下载共享文件
+		getShareFile(remotePath,localPath);
 
 	}
 	/**
@@ -92,7 +122,7 @@ public class CrlTest {
 		
 	}
 	/**
-	 * 通过url下载远程问价
+	 * 通过url下载远程文件
 	 * @param fileUrl
 	 * @param fileLocal
 	 * @throws Exception
@@ -100,13 +130,25 @@ public class CrlTest {
 	 public static void downloadFile(String fileUrl,String fileLocal) throws Exception {
 	        URL url = new URL(fileUrl);
 	        HttpURLConnection urlCon = (HttpURLConnection) url.openConnection();
+	        //第一种添加用户名授权方式
+//	        Authenticator.setDefault(new Authenticator(){   
+//
+//				@Override
+//				protected PasswordAuthentication getPasswordAuthentication() {
+//					return new PasswordAuthentication("pain","123.com".toCharArray());
+//				}
+//	        	
+//	        });
+	        //第二种添加用户名授权方式
+//	        String author=SecretUtil.encryptBASE64("pain:123.com".getBytes());
+//	        urlCon.setRequestProperty("Authorization", "Basic"+author);
 	        urlCon.setConnectTimeout(6000);
 	        urlCon.setReadTimeout(6000);
 	        int code = urlCon.getResponseCode();
 	        if (code != HttpURLConnection.HTTP_OK) {
 	            throw new Exception("文件读取失败");
 	        }
-	        
+	       
 	        //读文件流
 	        DataInputStream in = new DataInputStream(urlCon.getInputStream());
 	        DataOutputStream out = new DataOutputStream(new FileOutputStream(fileLocal));
@@ -119,9 +161,90 @@ public class CrlTest {
 	        in.close();
 	        System.out.println("下载完成！");
 	    }
-	
-   
-
+	/** 测试失败
+	 * 从共享目录拷贝文件到本地     path: smb:域名;用户名:密码@目的IP/文件夹/文件名.xxx 　|| "smb://szpcg;jiang.t:xxx@192.168.193.13/Jake/test.txt"
+	 * @param remoteFile  如果无密码 则url=smb://ip/sharefolder || smb://192.168.0.77/test  ;  如果有密码 Smb://username:password@ip/sharefolder  || smb://chb:123456@192.168.0.1/test
+	 * @param localFile
+	 */
+   public static void getSMBFile(String remotePath,String localPath){
+	    try {
+	    	NtlmPasswordAuthentication auth=new NtlmPasswordAuthentication("","pain","123.com");
+		    SmbFile remoteFile=new SmbFile(remotePath,auth);
+		    if(remotePath==null || remotePath.isEmpty()){
+		    	return;
+		    }
+		    String fileName=remoteFile.getName();//获取文件名
+		    File localFile=new File(localPath);
+		    
+		    InputStream in=new BufferedInputStream(new SmbFileInputStream(remoteFile));
+		    OutputStream out=new BufferedOutputStream(new FileOutputStream(localFile));
+		    
+		    byte[] buf=new byte[1024];
+		    int len=0;
+		    while((len=in.read(buf))>0){
+		    	out.write(buf, 0, len);
+		    	buf=new byte[1024];
+		    }
+		    in.close();
+		    out.close();
+		    System.out.println("从共享下载文件完成！");
+		} catch (Exception e) {
+	       e.printStackTrace();
+		}
+   }
+   /** 测试失败！
+    * 将本地文件拷贝到共享目录   
+    * @param remotePath
+    * @param localPath
+    */
+   public static void printSMBFile(String remotePath,String localPath){
+	   try{
+		   remotePath="smb:"+remotePath;
+		   SmbFile remoteFile=new SmbFile(remotePath);
+		   File localFile=new File(localPath);
+		   
+		   InputStream in=new BufferedInputStream(new FileInputStream(localFile));
+		   OutputStream out=new BufferedOutputStream(new SmbFileOutputStream(remoteFile));
+		   byte[] buf=new byte[1024];
+		   int len=0;
+		   while((len=in.read(buf))>0){
+			   out.write(buf, 0, len);
+			   buf=new byte[1024];
+		   }
+		   in.close();
+		   out.close();
+		   System.out.println("从本地上传文件到共享完成");
+	   }catch(Exception e){
+		   e.printStackTrace();
+	   }
+   }
+   /**
+    * 从共享目录下载文件到本地，
+    * @param remotePath="\\\\WIN-3LBGO979C1F\\CertEnroll\\WIN-3LBGO979C1F-CA.crl";
+    * @param localPath
+    */
+   public static void getShareFile(String remotePath,String localPath){
+	   try {
+		   File remoteFile=new File(remotePath);
+		   File localFile=new File(localPath);
+	  
+		   BufferedInputStream bis=new BufferedInputStream(new FileInputStream(remoteFile));
+		   BufferedOutputStream bos=new BufferedOutputStream(new FileOutputStream(localPath));
+		   byte[] buf=new byte[1024];
+		   int len=0;
+		   if((len=bis.read(buf))>0){
+			   bos.write(buf,0,len);
+			   buf=new byte[1024];
+		   }
+		   bos.flush();
+		   bis.close();
+		   bos.close();
+		   System.out.println("下载完成");
+	   } catch (Exception e) {
+		e.printStackTrace();
+	   }
+   }
+ 
 }
 
 
