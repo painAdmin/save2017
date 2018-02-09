@@ -14,9 +14,9 @@ public class EncryptUtil {
         "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};  
 	
     public static void main(String[] args) {
-    	String str="test123";
-		//System.out.println(EncryptUtil.encodeByMD5(str));
-		System.out.println(EncryptUtil.getSha1(str));
+    	String str="0102000000003620";
+		System.out.println(EncryptUtil.encodeByMD5(str).toUpperCase().substring(0, 16));
+		//System.out.println(EncryptUtil.getSha1(str));
 	}
 	   /**  对字符串进行MD5加密     */  
     public static String encodeByMD5(String originString){  

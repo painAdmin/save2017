@@ -45,8 +45,9 @@ public class CrlTest {
 		
 	
 		String certFile="C:\\Users\\pain\\Desktop\\cert\\user.cer";
+		String cert="C:\\Users\\pain\\Desktop\\cert\\1501cert\\cert4.cer";
 		// 解析cer证书信息
-		//readcerCert(certFile);
+		readcerCert(cert);
 		
 		String remoteFile="http://down.qingkan9.com/1/1070.txt";
 		String localFile="C:\\Users\\pain\\Desktop\\舞动乾坤.txt";
@@ -64,7 +65,7 @@ public class CrlTest {
 		String remotePath="\\\\WIN-3LBGO979C1F\\CertEnroll\\WIN-3LBGO979C1F-CA.crl";
 		String localPath="C:\\Users\\pain\\Desktop\\WIN-3LBGO979C1F-CA.crl";
 		// 下载共享文件
-		getShareFile(remotePath,localPath);
+		//getShareFile(remotePath,localPath);
 
 	}
 	/**
@@ -107,7 +108,7 @@ public class CrlTest {
 			fis.close();
 			
 			System.out.println("读取证书信息。。。。。。。。。");
-			System.out.println("序列号:"+cert.getSerialNumber().toString().toLowerCase());
+			System.out.println("序列号:"+cert.getSerialNumber().toString(16).toLowerCase());// new BigInteger(num).toString(进制)
 			System.out.println("issueDN:"+cert.getIssuerDN());
 			System.out.println("subjectDN"+cert.getSubjectDN());
 			System.out.println("证书算法OIDsignAllgoID:"+cert.getSigAlgOID());
